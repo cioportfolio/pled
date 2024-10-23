@@ -11,13 +11,14 @@
 #include <cmath>
 #include <cstring>
 
-#include "CRGB.hpp"
 #include "hardware/dma.h"
 #include "hardware/irq.h"
 #include "hardware/pio.h"
 #include "pico/sem.h"
 #include "pico/stdlib.h"
 #include "ws2812.pio.h"
+
+#include "CRGB.hpp"
 
 #define LEDBITS 24
 // bit plane content dma channel
@@ -67,11 +68,6 @@ void transpose_bits() {
         uint32_t s;
         uint32_t sbit;
         for (s = 0, sbit = 1; s < NUM_STRIPS; s++, sbit <<= 1) {
-#ifdef DEBUG
-#ifdef TEST_PLED
-            printf("l:%d s:%d sbit:%02X grb:%06X\n", l, s, sbit, strip[s][l].toGRB());
-#endif
-#endif
             for (uint32_t b = 0, grb = (strip[s][l] * brightness).toGRB(); b < LEDBITS && grb; b++, grb >>= 1) {
                 if (grb & 1) {
                     planes[l][LEDBITS - 1 - b] |= sbit;
