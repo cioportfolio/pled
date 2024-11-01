@@ -35,7 +35,9 @@ pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(pio_ws2812)
+add_executable(pio_ws2812
+        pled_demo.cpp
+        )
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/generated)
 
@@ -48,7 +50,7 @@ target_sources(pio_ws2812 PRIVATE pled_demo.cpp)
 target_compile_definitions(pio_ws2812 PRIVATE
         PIN_DBG1=3)
 
-target_link_libraries(pio_ws2812 PRIVATE pico_stdlib hardware_pio hardware_dma)
+target_link_libraries(pio_ws2812 PRIVATE pico_stdlib hardware_pio hardware_dma pico_rand)
 # enable usb output, disable uart output
 pico_enable_stdio_usb(pio_ws2812 1)
 pico_enable_stdio_uart(pio_ws2812 0)

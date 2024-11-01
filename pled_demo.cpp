@@ -11,16 +11,21 @@
 #endif
 #include <stdlib.h>
 #include <string.h>
+#include "pico/rand.h"
 
-#define LEDS_PER_STRIP 64
+#include <cmath>
+
+#define LEDS_PER_STRIP 256
 #define NUM_STRIPS 4
 #define PIN_BASE 2
 #define TOTAL_PIXELS (NUM_STRIPS * LEDS_PER_STRIP)
-#define INITIAL_BRIGHT 16
+#define INITIAL_BRIGHT 32
 
 #include "pled.hpp"
+#include "panel.hpp"
+#include "plasma.hpp"
 
-void pattern_snakes(int tick) {
+void pattern_snakes(int tick, int dir) {
     for (uint i = 0; i < TOTAL_PIXELS; i++) {
         uint x = (i + (tick >> 1)) % 64;
         if (x < 10)
@@ -34,21 +39,21 @@ void pattern_snakes(int tick) {
     }
 }
 
-void pattern_random(int tick) {
+void pattern_random(int tick, int dir) {
     if (tick % 8)
         return;
     for (uint i = 0; i < TOTAL_PIXELS; ++i)
-        PLED::led[i] = CRGB(rand());
+        PLED::led[i] = CRGB(1<<(rand()%8),1<<(rand()%8),1<<(rand()%8));
 }
 
-void pattern_sparkle(int tick) {
+void pattern_sparkle(int tick, int dir) {
     if (tick % 8)
         return;
     for (uint i = 0; i < TOTAL_PIXELS; ++i)
         PLED::led[i] = CRGB(rand() % 16 ? 0 : 0xffffffff);
 }
 
-void pattern_greys(int tick) {
+void pattern_greys(int tick, int dir) {
     uint max = 100;  // let's not draw too much current!
     tick %= max;
     for (uint i = 0; i < TOTAL_PIXELS; ++i) {
@@ -58,24 +63,38 @@ void pattern_greys(int tick) {
     }
 }
 
-void pattern_point(int tick) {
-    for (uint i = 0; i < TOTAL_PIXELS; ++i) {
-        PLED::led[i] = CRGB(0);
-    }
+void pattern_point(int tick, int dir) {
+    PLED::led[(uint)(tick-dir) % TOTAL_PIXELS] = CRGB(0);
     PLED::led[(uint)tick % TOTAL_PIXELS] = CRGB(0xFFFFFF);
 }
 
-typedef void (*pattern)(int tick);
+int soid(int t) {
+    return lednum(coord(TWIDTH/2+(TWIDTH/2)*std::cos((double)t/19), THEIGHT/2+(THEIGHT/2)*std::sin((double)t/29)));
+}
+
+void pattern_soid(int tick, int dir) {
+    for (uint i = 0; i < 127; ++i) {
+        PLED::led[soid(tick+i*dir)] = hsv2rgb(static_cast<uint8_t>(tick),255,2*i);
+    }
+}
+
+void pattern_plasma(int tick, int dir) {
+    genPlasma(PLED::led);
+}
+
+typedef void (*pattern)(int tick, int dir);
 const struct
 {
     pattern pat;
     const char *name;
-} pattern_table[] = {
+} pattern_table[] = {/*
     {pattern_snakes, "Snakes!"},
     {pattern_random, "Random data"},
     {pattern_sparkle, "Sparkles"},
     {pattern_greys, "Greys"},
-    {pattern_point, "Point"}};
+    {pattern_point, "Point"},*/
+    {pattern_plasma, "Plasma"},
+    {pattern_soid, "Sinusoidal"}};
 
 void prompt(const char *p) {
 #ifdef DEBUG
@@ -86,6 +105,7 @@ void prompt(const char *p) {
 }
 
 int main() {
+    srand(get_rand_32());
 #ifdef DEBUG
     stdio_init_all();
 
@@ -143,15 +163,15 @@ int main() {
         int tick = 0;
         int pat = rand() % count_of(pattern_table);
         int dir = (rand() >> 30) & 1 ? 1 : -1;
-        if (rand() & 1)
-            dir = 0;
+//        if (rand() & 1)
+//            dir = 0;
 #ifdef DEBUG
         printf(pattern_table[pat].name);
         prompt(dir == 1 ? "(forward)" : dir ? "(backward)"
                                             : "(still)");
 #endif
-        for (int i = 0; i < 1000; ++i) {
-            pattern_table[pat].pat(tick);
+        for (int i = 0; i < 2000; ++i) {
+            pattern_table[pat].pat(tick, dir);
 #ifdef DEBUG
             printf("First pixel %06X\r", PLED::led[0].toRGB());
 #endif
