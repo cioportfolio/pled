@@ -1,9 +1,8 @@
 // Adapted from https://github.com/raspberrypi/pico-examples/blob/master/pio/ws2812/ws2812_parallel.c
 // SPDX-License-Identifier: BSD-3-Clause
-
-// #define DEBUG
+//define DEBUG
 // #define TEST_CRGB
-// #define TEST_PLED
+//define TEST_PLED
 
 #ifdef DEBUG
 #include <stdio.h>
@@ -17,7 +16,7 @@
 
 #define LEDS_PER_STRIP 256
 #define NUM_STRIPS 4
-#define PIN_BASE 2
+#define PIN_BASE 3
 #define TOTAL_PIXELS (NUM_STRIPS * LEDS_PER_STRIP)
 #define INITIAL_BRIGHT 32
 
@@ -93,8 +92,8 @@ const struct
     {pattern_sparkle, "Sparkles"},
     {pattern_greys, "Greys"},
     {pattern_point, "Point"},*/
-    {pattern_plasma, "Plasma"},
-    {pattern_soid, "Sinusoidal"}};
+    {pattern_soid, "Sinusoidal"},
+    {pattern_plasma, "Plasma"}};
 
 void prompt(const char *p) {
 #ifdef DEBUG
