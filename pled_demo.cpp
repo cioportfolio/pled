@@ -16,7 +16,7 @@
 
 #define LEDS_PER_STRIP 256
 #define NUM_STRIPS 4
-#define PIN_BASE 3
+#define PIN_BASE 2
 #define TOTAL_PIXELS (NUM_STRIPS * LEDS_PER_STRIP)
 #define INITIAL_BRIGHT 32
 
