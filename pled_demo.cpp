@@ -23,6 +23,7 @@
 #include "pled.hpp"
 #include "panel.hpp"
 #include "plasma.hpp"
+#include "xmas.hpp"
 
 void pattern_snakes(int tick, int dir) {
     for (uint i = 0; i < TOTAL_PIXELS; i++) {
@@ -81,6 +82,18 @@ void pattern_plasma(int tick, int dir) {
     genPlasma(PLED::led);
 }
 
+XMAS xmas(PLED::led);
+
+void pattern_xmas(int tick, int dir) {
+    xmas.gen();
+}
+
+FIRE fire(PLED::led);
+
+void pattern_fire(int tick, int dir) {
+    fire.gen(35);
+}
+
 typedef void (*pattern)(int tick, int dir);
 const struct
 {
@@ -91,9 +104,11 @@ const struct
     {pattern_random, "Random data"},
     {pattern_sparkle, "Sparkles"},
     {pattern_greys, "Greys"},
-    {pattern_point, "Point"},*/
+    {pattern_point, "Point"},
     {pattern_soid, "Sinusoidal"},
-    {pattern_plasma, "Plasma"}};
+    {pattern_plasma, "Plasma"},*/
+    {pattern_fire, "Fire"},
+    {pattern_xmas, "Xmas"}};
 
 void prompt(const char *p) {
 #ifdef DEBUG
@@ -177,6 +192,7 @@ int main() {
             tick += dir;
             PLED::show();
         }
+        xmas.resetChapter();
 #ifdef DEBUG
         printf("First pixel %06X\n", PLED::led[0].toRGB());
 #endif

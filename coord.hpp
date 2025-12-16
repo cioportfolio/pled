@@ -9,7 +9,9 @@ struct coord {
     int x;
     int y;
 
-    coord(uint x, uint y): x(x), y(y) {};
+    coord(): x(0), y(0) {};
+
+    coord(int x, int y): x(x), y(y) {};
 
     coord operator+(coord b) {
         coord res(x+b.x, y+b.y);
@@ -38,6 +40,14 @@ struct coord {
 
     coord clamp(coord max) {
         return coord(std::max(0, std::min(x, max.x-1)), std::max(0, std::min(x, max.x-1)));
+    }
+
+    bool isInside(coord min, coord max) {
+        return (x>=min.x && x <max.x && y>=min.y && y<max.y);
+    }
+
+    bool isInside(coord max) {
+        return isInside(coord(0,0), max);
     }
 
 };

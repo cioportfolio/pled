@@ -59,6 +59,14 @@ struct CRGB {
         return *this;
     }
 
+    bool operator==(CRGB rgb2) {
+        return r==rgb2.r && g==rgb2.g && b==rgb2.b;
+    }
+
+    bool operator!=(CRGB rgb2) {
+        return !(operator==(rgb2));
+    }
+
     uint32_t toRGB() {
         return ((uint32_t)(r) << 16) |
                ((uint32_t)(g) << 8) |
